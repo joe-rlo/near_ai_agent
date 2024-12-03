@@ -1,5 +1,5 @@
 def main():
-    """Example of how to use the agent"""
+    """Example script to run the agent"""
     import argparse
     
     parser = argparse.ArgumentParser(description="Run the NEAR AI agent")
@@ -9,15 +9,8 @@ def main():
     
     args = parser.parse_args()
     
-    if args.local:
-        # Local development mode
-        from near_ai_agent.mock_env import MockEnvironment
-        env = MockEnvironment(args.execution_folder)
-    else:
-        # Production mode - env will be provided by NEAR AI
-        raise ValueError("This script is for local testing only")
-    
-    agent = NearAIAgent(env)
+    # Create agent with no environment for local testing
+    agent = NearAIAgent()
     agent.run()
 
 if __name__ == "__main__":
