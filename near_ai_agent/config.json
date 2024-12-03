@@ -1,0 +1,8 @@
+{
+    "agent_name": "NearAIExampleAgent",
+    "version": "1.0.0",
+    "default_tasks": {
+        "greet": "Hello! I'm your NEAR AI Agent, here to assist you.",
+        "help": "I can help with tasks such as 'fetch_user_info' and 'provide_weather'."
+    }
+}
