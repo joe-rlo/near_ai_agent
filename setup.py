@@ -14,6 +14,11 @@ setup(
     install_requires=[
         "requests>=2.25.1",
     ],
+    entry_points={
+        "console_scripts": [
+            "near-ai-agent=near_ai_agent.cli:main",
+        ],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
