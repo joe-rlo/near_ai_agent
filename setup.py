@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="near_ai_agent",
-    version="1.0.0",
+    version="1.0.0-alpha.1",
     author="Joe Spano",
     author_email="community@near.dev",
     description="A Python package to build AI agents on NEAR Protocol.",
