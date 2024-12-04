@@ -5,6 +5,7 @@ import json
 from typing import Optional
 from .agent import NearAIAgent
 from .environment import NearAIEnvironment
+import re
 
 def create_agent(name: str, template: Optional[str] = None) -> None:
     """
@@ -14,9 +15,12 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
         name: Name of the agent
         template: Optional template to use (basic, advanced, or near)
     """
-    directory = f"./{name}"
+    # Sanitize the agent name to be a valid Python identifier
+    sanitized_name = re.sub(r'\W|^(?=\d)', '_', name)  # Replace non-alphanumeric characters with underscores
+
+    directory = f"./{sanitized_name}"
     if os.path.exists(directory):
-        print(f"Directory '{name}' already exists. Aborting.")
+        print(f"Directory '{sanitized_name}' already exists. Aborting.")
         return
 
     os.makedirs(directory)
@@ -24,7 +28,7 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
     # Select template configuration
     if template == "near":
         config = {
-            "agent_name": name,
+            "agent_name": sanitized_name,
             "version": "1.0.0",
             "system_prompt": {
                 "role": "system",
@@ -37,7 +41,7 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
         # Create NEAR AI metadata
         metadata = {
             "category": "agent",
-            "description": f"A NEAR AI agent named {name}",
+            "description": f"A NEAR AI agent named {sanitized_name}",
             "tags": ["python", "assistant"],
             "details": {
                 "agent": {
@@ -50,7 +54,7 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
                 }
             },
             "show_entry": True,
-            "name": name,
+            "name": sanitized_name,
             "version": "0.1.0"
         }
         
@@ -59,10 +63,10 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
             
     else:  # basic or advanced template
         config = {
-            "agent_name": name,
+            "agent_name": sanitized_name,
             "version": "1.0.0",
             "default_tasks": {
-                "greet": f"Hello! I'm {name}, your custom agent.",
+                "greet": f"Hello! I'm {sanitized_name}, your custom agent.",
                 "help": "I can assist with various tasks including file operations and calculations."
             }
         }
@@ -74,21 +78,21 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
     # Create agent implementation
     agent_code = f"""from near_ai_agent.agent import NearAIAgent
 
-class {name.capitalize()}Agent(NearAIAgent):
+class {sanitized_name.capitalize()}Agent(NearAIAgent):
     def _register_tools(self):
         super()._register_tools()
         
         @self.tool_registry.register_tool
-        def custom_action(param: str) -> str:
+        def custom_action(self, param: str) -> str:
             \"\"\"Example custom tool - replace with your own functionality\"\"\"
-            return f"Processed {param}"
+            return "Processed {{param}}"
 
 if __name__ == "__main__":
-    agent = {name.capitalize()}Agent()
+    agent = {sanitized_name.capitalize()}Agent()
     agent.run()
 """
     
-    with open(f"{directory}/{name}_agent.py", "w") as f:
+    with open(f"{directory}/{sanitized_name}_agent.py", "w") as f:
         f.write(agent_code)
         
     # Create example usage script
@@ -118,10 +122,10 @@ if __name__ == "__main__":
     with open(f"{directory}/run.py", "w") as f:
         f.write(example_code)
 
-    print(f"""Agent '{name}' created successfully in ./{name}/
+    print(f"""Agent '{sanitized_name}' created successfully in ./{sanitized_name}/
     
 Files created:
-- {name}_agent.py - Main agent implementation
+- {sanitized_name}_agent.py - Main agent implementation
 - config.json - Agent configuration
 - run.py - Example usage script
 {f'- metadata.json - NEAR AI deployment configuration' if template == 'near' else ''}
@@ -130,7 +134,7 @@ To run locally:
     python {directory}/run.py --local
 
 For NEAR AI deployment:
-    nearai agent interactive {name} --local
+    nearai agent interactive {sanitized_name} --local
 """)
 
 def run_agent(config_path: str, local: bool = False, env_path: str = "/tmp/agent_run") -> None:

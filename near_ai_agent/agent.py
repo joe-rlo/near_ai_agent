@@ -1,6 +1,7 @@
 from typing import Dict, Any, List, Optional
 from .environment import NearAIEnvironment
 from .tasks import fetch_user_info, provide_weather
+import json
 
 class NearAIAgent:
     def __init__(self, env=None, config_path="near_ai_agent/config.json"):
