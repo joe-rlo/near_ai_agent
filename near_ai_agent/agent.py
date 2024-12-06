@@ -37,18 +37,23 @@ class NearAIAgent:
             }
 
     def _register_tools(self) -> None:
-        """Register available tools"""
-        # Register existing task functions as tools
-        self.tool_registry.register_tool(fetch_user_info)
-        self.tool_registry.register_tool(provide_weather)
+        """Register available tools with detailed documentation"""
         
-        # Register additional tools
         @self.tool_registry.register_tool
-        def save_progress(filename: str, content: str) -> str:
-            """Save progress to a file"""
-            if hasattr(self.environment.env, 'write_file'):
-                self.environment.env.write_file(filename, content)
-            return f"Progress saved to {filename}"
+        def custom_action(self, param: str) -> str:
+            """
+            Process a custom action with the given parameter.
+            
+            Args:
+                param: The input parameter to process
+                
+            Returns:
+                str: The processed result
+                
+            Example:
+                custom_action("test") -> "Processed test"
+            """
+            return f"Processed {param}"
 
     def process_message(self, max_iterations: int = 5) -> None:
         """Main message processing loop"""

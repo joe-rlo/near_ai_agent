@@ -32,30 +32,43 @@ def create_agent(name: str, template: Optional[str] = None) -> None:
             "version": "1.0.0",
             "system_prompt": {
                 "role": "system",
-                "content": "You are a helpful AI assistant that can use tools and process user requests."
+                "content": """You are a helpful AI assistant with access to various tools. You can:
+1. Use tools when explicitly needed
+2. Ask for clarification when instructions are unclear
+3. Break down complex tasks into smaller steps
+4. Provide clear, concise responses
+
+Always format code and technical output in markdown."""
             },
             "model": "qwen2p5-72b-instruct",
-            "temperature": 0.7
+            "temperature": 0.7,
+            "max_tokens": 16384
         }
         
         # Create NEAR AI metadata
         metadata = {
             "category": "agent",
             "description": f"A NEAR AI agent named {sanitized_name}",
-            "tags": ["python", "assistant"],
+            "tags": ["python", "assistant", "near-ai"],
             "details": {
                 "agent": {
                     "defaults": {
                         "model": "qwen2p5-72b-instruct",
                         "model_max_tokens": 16384,
                         "model_provider": "fireworks",
-                        "model_temperature": 0.7
+                        "model_temperature": 0.7,
+                        "capabilities": [
+                            "custom_actions",
+                            "file_operations",
+                            "user_interaction"
+                        ]
                     }
                 }
             },
             "show_entry": True,
             "name": sanitized_name,
-            "version": "0.1.0"
+            "version": "0.1.0",
+            "min_api_version": "1.0.0"
         }
         
         with open(f"{directory}/metadata.json", "w") as f:
@@ -97,6 +110,7 @@ if __name__ == "__main__":
         
     # Create example usage script
     example_code = """import argparse
+import json
 from near_ai_agent.agent import NearAIAgent
 from near_ai_agent.environment import NearAIEnvironment
 
@@ -104,14 +118,17 @@ def main():
     parser = argparse.ArgumentParser(description="Run the agent")
     parser.add_argument("--local", action="store_true", help="Run in local mode")
     parser.add_argument("--env_path", default="/tmp/agent_run", help="Environment path")
+    parser.add_argument("--config", default="config.json", help="Path to config file")
     
     args = parser.parse_args()
     
     if args.local:
-        env = NearAIEnvironment()  # Creates mock environment
-        agent = NearAIAgent(env=env)
+        env = NearAIEnvironment()
+        with open(args.config) as f:
+            config = json.load(f)
+        agent = NearAIAgent(env=env, config_path=args.config)
     else:
-        agent = NearAIAgent()  # For NEAR AI deployment
+        agent = NearAIAgent()
         
     agent.run()
 
